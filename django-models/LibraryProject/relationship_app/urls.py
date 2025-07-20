@@ -18,5 +18,12 @@ urlpatterns = [
     # path('', views.home, name='home'), 
 ]
 
+from django.urls import path
+from .views import admin_view
+
+urlpatterns = [
+    path('admin-dashboard/', admin_view, name='admin_view'),
 ]
+
+
 
