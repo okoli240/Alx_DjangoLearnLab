@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import DetailView
-from .models import Book  # Keep if needed
-from .models import Library  # ✅ This exact line for the checker
+from django.views.generic.detail import DetailView  # ✅ Must match this exactly
+from .models import Book
+from .models import Library
 
 
 # Function-based view
