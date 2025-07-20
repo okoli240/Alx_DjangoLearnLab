@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
@@ -22,6 +24,13 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        permissions = [
+            ("can_add_book", "Can add a book"),
+            ("can_change_book", "Can edit a book"),
+            ("can_delete_book", "Can delete a book"),
+        ]
+
 
 class Librarian(models.Model):
     name = models.CharField(max_length=100)
@@ -30,8 +39,6 @@ class Librarian(models.Model):
     def __str__(self):
         return self.name
 
-from django.db import models
-from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
     ROLE_CHOICES = [
