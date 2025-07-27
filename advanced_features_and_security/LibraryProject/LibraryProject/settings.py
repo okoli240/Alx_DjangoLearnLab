@@ -97,11 +97,27 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # === Security Headers ===
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True  # ✅ Forces all HTTP to HTTPS
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # ✅ Browser should only access via HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # ✅ Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # ✅ Allow browser preload
+
+# Prevent content type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True  # ✅ Block MIME-type sniffing
+
+# Enable XSS filter in browser
+SECURE_BROWSER_XSS_FILTER = True  # ✅ Enable XSS protection
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = 'DENY'  # ✅ Deny iframe embedding
+
+# Secure cookies over HTTPS only
+CSRF_COOKIE_SECURE = True  # ✅ CSRF cookie sent only via HTTPS
+SESSION_COOKIE_SECURE = True  # ✅ Session cookie sent only via HTTPS
 
 # === Content Security Policy (CSP) ===
 CSP_DEFAULT_SRC = ("'self'",)
