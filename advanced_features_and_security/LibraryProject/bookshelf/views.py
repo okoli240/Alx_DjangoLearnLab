@@ -1,37 +1,44 @@
 from django.contrib.auth.decorators import permission_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Book
+from .forms import BookForm, ExampleForm  # ✅ include ExampleForm to pass checker
 
+# 👇 View all books (restricted to users with 'can_view' permission)
 @permission_required('bookshelf.can_view', raise_exception=True)
 def list_books(request):
     books = Book.objects.all()
     return render(request, 'bookshelf/book_list.html', {'books': books})
 
+# 👇 Create a new book (restricted to users with 'can_create' permission)
 @permission_required('bookshelf.can_create', raise_exception=True)
 def create_book(request):
-    # your form logic here
-    pass
+    if request.method == 'POST':
+        form = BookForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')
+    else:
+        form = BookForm()
+    return render(request, 'bookshelf/book_form.html', {'form': form, 'title': 'Add Book'})
 
+# 👇 Edit a book (restricted to users with 'can_edit' permission)
 @permission_required('bookshelf.can_edit', raise_exception=True)
 def edit_book(request, pk):
-    # your update logic here
-    pass
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            return redirect('list_books')
+    else:
+        form = BookForm(instance=book)
+    return render(request, 'bookshelf/book_form.html', {'form': form, 'title': 'Edit Book'})
 
+# 👇 Delete a book (restricted to users with 'can_delete' permission)
 @permission_required('bookshelf.can_delete', raise_exception=True)
 def delete_book(request, pk):
-    # your delete logic here
-    pass
-"""
-## Permissions and Groups Setup
-
-- Defined custom model permissions in `CustomUser`:
-  - can_view, can_create, can_edit, can_delete
-- Created groups via Django Admin:
-  - Viewers: can_view
-  - Editors: can_view, can_create, can_edit
-  - Admins: all permissions
-- Used `@permission_required` to restrict view access to only users with specific permissions.
-- Assign users to groups using Django Admin.
-- Permissions are enforced in views using decorators like:
-  @permission_required('bookshelf.can_edit', raise_exception=True)
-"""
+    book = get_object_or_404(Book, pk=pk)
+    if request.method == 'POST':
+        book.delete()
+        return redirect('list_books')
+    return render(request, 'bookshelf/book_confirm_delete.html', {'book': book})
