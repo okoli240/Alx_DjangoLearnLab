@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # 👇 Add your app here
     'bookshelf',  # ✅ ADD THIS LINE
     'relationship_app',
+    'core',
 ]
 
 
@@ -129,3 +130,5 @@ LOGIN_REDIRECT_URL = '/'
 
 # Redirect after logout
 LOGOUT_REDIRECT_URL = '/login/'
+AUTH_USER_MODEL = 'core.CustomUser'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
