@@ -112,6 +112,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # ✅ Block MIME-type sniffing
 # Enable XSS filter in browser
 SECURE_BROWSER_XSS_FILTER = True  # ✅ Enable XSS protection
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Prevent clickjacking
 X_FRAME_OPTIONS = 'DENY'  # ✅ Deny iframe embedding
 
