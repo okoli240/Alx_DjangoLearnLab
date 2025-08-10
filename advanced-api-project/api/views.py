@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework import filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.exceptions import NotFound
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -14,7 +15,7 @@ class BookListView(generics.ListAPIView):
     Searching allowed on: title, author__name
     Ordering allowed on: title, publication_year, author__name
     """
-   class BookListView(generics.ListAPIView):
+   
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
