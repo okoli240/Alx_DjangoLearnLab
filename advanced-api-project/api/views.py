@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions
+from rest_framework.exceptions import NotFound
 from .models import Book
 from .serializers import BookSerializer
 
@@ -26,8 +27,26 @@ class BookUpdateView(generics.UpdateAPIView):
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_object(self):
+        pk = self.request.data.get('id') or self.request.query_params.get('id')
+        if not pk:
+            raise NotFound("Missing 'id' in request data or query parameters.")
+        try:
+            return Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            raise NotFound("Book not found.")
+
 # DeleteView: Remove a book (only authenticated users)
 class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        pk = self.request.data.get('id') or self.request.query_params.get('id')
+        if not pk:
+            raise NotFound("Missing 'id' in request data or query parameters.")
+        try:
+            return Book.objects.get(pk=pk)
+        except Book.DoesNotExist:
+            raise NotFound("Book not found.")
