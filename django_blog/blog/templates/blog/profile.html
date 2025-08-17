@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Profile</h2>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <h3>Account</h3>
+  {{ uform.non_field_errors }}
+  {% for field in uform %}
+    <div>
+      {{ field.label_tag }}
+      {{ field }}
+      {% for err in field.errors %}<div class="error">{{ err }}</div>{% endfor %}
+    </div>
+  {% endfor %}
+
+  <h3>Profile</h3>
+  {{ pform.non_field_errors }}
+  {% for field in pform %}
+    <div>
+      {{ field.label_tag }}
+      {{ field }}
+      {% for err in field.errors %}<div class="error">{{ err }}</div>{% endfor %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">Save changes</button>
+</form>
+{% endblock %}

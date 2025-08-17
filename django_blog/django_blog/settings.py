@@ -111,3 +111,14 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# after existing settings
+LOGIN_REDIRECT_URL = 'blog:profile'
+LOGOUT_REDIRECT_URL = 'login'           # or any public page
+LOGIN_URL = 'login'
+
+# Make sure MEDIA is configured (you already have)
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR / "media"
+
+# Add development-only static file serving in urls.py (shown below)
