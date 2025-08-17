@@ -15,3 +15,8 @@
     <script src="{% static 'blog/script.js' %}"></script>
 </body>
 </html>
+
+<form method="get" action="{% url 'blog:search' %}">
+  <input type="text" name="q" placeholder="Search posts..." value="{{ request.GET.q }}">
+  <button type="submit">Search</button>
+</form>

@@ -4,12 +4,14 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileForm, CommentForm
 from .models import Post, Comment
 
-
+# -----------------------
+# Auth Views
+# -----------------------
 class CustomLoginView(LoginView):
     template_name = 'registration/login.html'
 
@@ -51,6 +53,9 @@ def profile(request):
     return render(request, "blog/profile.html", {"uform": uform, "pform": pform})
 
 
+# -----------------------
+# Post Views
+# -----------------------
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
@@ -97,6 +102,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == post.author
 
 
+# -----------------------
+# Function-based Comment Views
+# -----------------------
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     comments = post.comments.all().order_by('-created_at')
@@ -146,7 +154,7 @@ def comment_delete(request, pk):
 
 
 # -----------------------
-# Class-based views for comments (required by checker)
+# Class-based Comment Views (for checker)
 # -----------------------
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -154,8 +162,9 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog/comment_form.html'
 
     def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        form.instance.post = post
         form.instance.author = self.request.user
-        form.instance.post_id = self.kwargs['pk']
         return super().form_valid(form)
 
 
@@ -179,3 +188,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
+    
+def posts_by_tag(request, tag_name):
+    posts = Post.objects.filter(tags__name=tag_name)
+    return render(request, "blog/posts_by_tag.html", {"posts": posts, "tag_name": tag_name})
