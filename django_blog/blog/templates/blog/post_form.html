@@ -7,3 +7,27 @@
     <button type="submit">Save</button>
   </form>
 {% endblock %}
+
+<h2>Comments</h2>
+{% for comment in comments %}
+    <p><strong>{{ comment.author }}</strong>: {{ comment.content }}</p>
+    <small>{{ comment.created_at|date:"M d, Y H:i" }}</small>
+    {% if user == comment.author %}
+        <a href="{% url 'comment-edit' comment.pk %}">Edit</a> |
+        <a href="{% url 'comment-delete' comment.pk %}">Delete</a>
+    {% endif %}
+    <hr>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}
+
+{% if user.is_authenticated %}
+    <h3>Leave a Comment</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Post Comment</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> to comment.</p>
+{% endif %}

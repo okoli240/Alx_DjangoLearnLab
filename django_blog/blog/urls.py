@@ -23,4 +23,7 @@ urlpatterns = [
     path('post/new/', views.PostCreateView.as_view(), name='post-create'),   # ✅ Create
     path('post/<int:pk>/update/', views.PostUpdateView.as_view(), name='post-update'),  # ✅ Update
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),  # ✅ Delete
+
+    path('comment/<int:pk>/edit/', views.comment_edit, name='comment-edit'),
+    path('comment/<int:pk>/delete/', views.comment_delete, name='comment-delete'),
 ]
