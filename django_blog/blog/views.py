@@ -6,6 +6,7 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Q  # ✅ Needed for search
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileForm, CommentForm
 from .models import Post, Comment
 
@@ -61,6 +62,18 @@ class PostListView(ListView):
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
     ordering = ['-created_at']
+
+    # ✅ Add search functionality here
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get("q")
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+        return queryset
 
 
 class PostDetailView(DetailView):
@@ -189,6 +202,10 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         comment = self.get_object()
         return self.request.user == comment.author
     
+
+# -----------------------
+# Extra Views
+# -----------------------
 def posts_by_tag(request, tag_name):
     posts = Post.objects.filter(tags__name=tag_name)
     return render(request, "blog/posts_by_tag.html", {"posts": posts, "tag_name": tag_name})
