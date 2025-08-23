@@ -1,9 +1,8 @@
 from rest_framework import viewsets, permissions, generics, status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework.generics import get_object_or_404  # ✅ use DRF's version
 
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
@@ -25,7 +24,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        # SAFE_METHODS = GET, HEAD, OPTIONS (read-only)
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.author == request.user
@@ -55,7 +53,7 @@ class LikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = get_object_or_404(Post, pk=pk)  # ✅ DRF version
         like, created = Like.objects.get_or_create(user=request.user, post=post)
 
         if not created:
@@ -67,7 +65,7 @@ class LikePostView(generics.GenericAPIView):
                 recipient=post.author,
                 actor=request.user,
                 verb="liked your post",
-                target=post,  # ✅ works with GenericForeignKey
+                target=post,
             )
 
         return Response({"detail": "Post liked."}, status=status.HTTP_201_CREATED)
@@ -78,17 +76,18 @@ class UnlikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = get_object_or_404(Post, pk=pk)  # ✅ DRF version
         like = Like.objects.filter(user=request.user, post=post).first()
 
         if not like:
             return Response({"detail": "You haven't liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Optionally: remove the notification too
+        # Remove the notification
         Notification.objects.filter(
             recipient=post.author,
             actor=request.user,
             verb="liked your post",
+            target=post
         ).delete()
 
         like.delete()
