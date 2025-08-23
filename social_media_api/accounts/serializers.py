@@ -1,15 +1,14 @@
-# accounts/serializers.py
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from .models import User
+User = get_user_model()  # ✅ replace "from .models import User"
 
 
 class UserSerializer(serializers.ModelSerializer):
-    followers_count = serializers.IntegerField(source="followers_count", read_only=True)
-    following_count = serializers.IntegerField(source="following_count", read_only=True)
+    followers_count = serializers.IntegerField(source="followers.count", read_only=True)
+    following_count = serializers.IntegerField(source="following.count", read_only=True)
 
     class Meta:
         model = User
@@ -33,10 +32,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        # Use get_user_model().objects.create_user to satisfy checker
         password = validated_data.pop("password")
-        user = get_user_model().objects.create_user(password=password, **validated_data)
-        # Explicitly use Token.objects.create (not just get_or_create)
+        user = User.objects.create_user(password=password, **validated_data)  # ✅ consistent
         Token.objects.create(user=user)
         return user
 
