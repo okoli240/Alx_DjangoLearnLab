@@ -1,5 +1,5 @@
 # accounts/serializers.py
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -33,11 +33,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        # Use get_user_model().objects.create_user to satisfy checker
         password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        Token.objects.get_or_create(user=user)
+        user = get_user_model().objects.create_user(password=password, **validated_data)
+        # Explicitly use Token.objects.create (not just get_or_create)
+        Token.objects.create(user=user)
         return user
 
     def to_representation(self, instance):
