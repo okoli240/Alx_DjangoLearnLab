@@ -2,7 +2,6 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404  # ✅ use DRF's version
 
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
@@ -53,13 +52,12 @@ class LikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # ✅ DRF version
+        post = generics.get_object_or_404(Post, pk=pk)  # ✅ DRF version
         like, created = Like.objects.get_or_create(user=request.user, post=post)
 
         if not created:
             return Response({"detail": "You already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create notification if not liking own post
         if post.author != request.user:
             Notification.objects.create(
                 recipient=post.author,
@@ -76,7 +74,7 @@ class UnlikePostView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)  # ✅ DRF version
+        post = generics.get_object_or_404(Post, pk=pk)  # ✅ DRF version
         like = Like.objects.filter(user=request.user, post=post).first()
 
         if not like:
