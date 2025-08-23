@@ -1,3 +1,4 @@
+# social_media_api/settings.py
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -7,12 +8,12 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECURITY
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "change-me-in-prod")
 DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ["true", "1"]
-
-# Replace with your production domain(s)
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost").split(",")
 
+# APPLICATIONS
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -61,7 +62,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "social_media_api.wsgi.application"
 
-# Production-ready database (PostgreSQL example)
+# DATABASE (PostgreSQL for production)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -73,6 +74,7 @@ DATABASES = {
     }
 }
 
+# PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -80,11 +82,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# INTERNATIONALIZATION
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 USE_TZ = True
 
+# STATIC & MEDIA
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -93,10 +97,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Custom user model
+# CUSTOM USER MODEL
 AUTH_USER_MODEL = "accounts.CustomUser"
 
-# Django REST Framework configuration
+# REST FRAMEWORK
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -106,13 +110,18 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Security settings
+# SECURITY SETTINGS
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "True").lower() in ["true", "1"]
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
 
-# Optional: Heroku / cloud settings
+# HEROKU / CLOUD DEPLOYMENT
 if os.getenv("ON_HEROKU", "False").lower() in ["true", "1"]:
     import django_heroku
     django_heroku.settings(locals())
