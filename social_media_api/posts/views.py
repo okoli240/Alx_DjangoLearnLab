@@ -67,7 +67,7 @@ class LikePostView(generics.GenericAPIView):
                 recipient=post.author,
                 actor=request.user,
                 verb="liked your post",
-                target=post,
+                target=post,  # ✅ works with GenericForeignKey
             )
 
         return Response({"detail": "Post liked."}, status=status.HTTP_201_CREATED)
@@ -84,5 +84,12 @@ class UnlikePostView(generics.GenericAPIView):
         if not like:
             return Response({"detail": "You haven't liked this post."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Optionally: remove the notification too
+        Notification.objects.filter(
+            recipient=post.author,
+            actor=request.user,
+            verb="liked your post",
+        ).delete()
+
         like.delete()
-        return Response({"detail": "Post unliked."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Post unliked."}, status=status.HTTP_200_OK)
